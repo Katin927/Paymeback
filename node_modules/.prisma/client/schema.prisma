@@ -1,0 +1,68 @@
+// prisma/schema.prisma
+
+// 1. Your database connection
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 2. Prisma Client generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+/////////////////////
+// 3. Data Models  //
+/////////////////////
+
+/// Users who send/receive invoices
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Invoices this user owns
+  invoices Invoice[]
+
+  // Contacts imported by this user
+  contacts Contact[] @relation("UserContacts")
+}
+
+/// Invoices sent by users
+model Invoice {
+  id            Int      @id @default(autoincrement())
+  ownerId       Int
+  borrowerName  String
+  borrowerEmail String?
+  borrowerPhone String?
+  issueDate     DateTime
+  items         Json // e.g. [{ description, amount }, …]
+  total         Float
+  termsType     String // one-time | fixed | borrower
+  planAmount    Float? // if fixed
+  planFreq      String? // if fixed: weekly | monthly
+  memo          String?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relation back to the owner
+  owner User @relation(fields: [ownerId], references: [id])
+}
+
+/// Contacts imported (via Google Contacts or Contact Picker)
+model Contact {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  email     String?
+  phone     String?
+  createdAt DateTime @default(now())
+
+  // Relation back to the importing user
+  User User @relation("UserContacts", fields: [userId], references: [id])
+}
