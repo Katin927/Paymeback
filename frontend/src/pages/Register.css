@@ -1,0 +1,111 @@
+/* src/pages/Register.css — Aligned with Invoice Theme */
+
+:root {
+  --form-bg: var(--panel);
+  --form-border: var(--border);
+  --form-shadow: var(--shadow);
+  --form-accent: var(--accent);
+  --form-text: var(--text);
+  --form-bg-overlay: rgba(0, 123, 255, 0.1);
+}
+
+.register {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.register__container {
+  background: var(--form-bg);
+  border: 1px solid var(--form-border);
+  border-radius: 8px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 12px var(--form-shadow);
+}
+
+.register__logo-img {
+  display: block;
+  margin: 0 auto 1rem;
+  width: 100px;
+  height: auto;
+}
+
+.register__container h2 {
+  color: var(--form-accent);
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.register__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.register__form input {
+  background: var(--form-bg-overlay);
+  border: 1px solid var(--form-border);
+  border-radius: 4px;
+  padding: 0.75rem .05rem;
+  color: var(--form-text);
+  width: 100%;
+}
+
+.register__form input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.register__form button {
+  background: var(--form-accent);
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem;
+  font-weight: 600;
+  color: var(--bg);
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register__form button:hover {
+  background: rgba(78, 168, 255, 0.8);
+  box-shadow: 0 0 10px var(--form-accent);
+}
+
+.register__signin {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.register__signin a {
+  color: var(--form-accent);
+  text-decoration: none;
+}
+
+.register__signin a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .register__container {
+    padding: 2rem 1rem;
+  }
+  .register__logo-img {
+    width: 80px;
+    margin-bottom: 0.75rem;
+  }
+  .register__container h2 {
+    font-size: 1.5rem;
+  }
+}

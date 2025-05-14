@@ -1,0 +1,31 @@
+.privacy-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+  }
+  
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px var(--shadow);
+    padding: 2rem;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+  }
+  
+  .panel h2 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  
+  .panel h3 {
+    margin-top: 1.5rem;
+    color: var(--accent);
+  }
+  
+  .panel p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  

@@ -1,0 +1,22 @@
+:root {
+    /* Light Mode */
+    --color-background: #f1f5f9;
+    --color-surface: #ffffff;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #64748b;
+    --color-accent: #25f0ff; /* Darker neon blue */
+    --color-accent-soft: rgba(0, 188, 212, 0.15);
+    --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --radius-base: 10px;
+  }
+  
+  [data-theme='dark'] {
+    --color-background: #0f0f0f;
+    --color-surface: #1a1a1a;
+    --color-text-primary: #f8fafc;
+    --color-text-secondary: #94a3b8;
+    --color-accent: #25f0ff;
+    --color-accent-soft: rgba(0, 188, 212, 0.15);
+    --shadow-card: 0 0 20px rgba(0, 188, 212, 0.1);
+  }
+  

@@ -1,0 +1,193 @@
+/* src/pages/Invoice.css */
+
+:root {
+  --bg: #ffffff;
+  --panel: #f7f7f7;
+  --border: #dddddd;
+  --text: #333333;
+  --accent: #007bff;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --danger: #dc3545;
+}
+
+[data-theme="dark"] {
+  --bg: #1e1e1e;
+  --panel: #2a2a2a;
+  --border: #3a3a3a;
+  --text: #e0e0e0;
+  --accent: #4ea8ff;
+  --shadow: rgba(0, 0, 0, 0.5);
+  --danger: #f07178;
+}
+
+.invoice-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* default subtle glow for individual invoice */
+  box-shadow: 0 0 12px var(--accent);
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+/* Neon glow on split mode overrides default */
+.invoice-page.split-mode {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent);
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.invoice-logo-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.invoice-logo {
+  height: 60px;
+}
+
+.issuer-info {
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.invoice-meta-box {
+  background-color: var(--bg);
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  text-align: right;
+  color: var(--text);
+}
+
+.invoice-meta-box .mode-select select {
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.invoice-form h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3rem;
+  color: var(--accent);
+}
+
+.field-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.field-group input,
+.field-group select {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.items-table th,
+.items-table td {
+  padding: 0.75rem;
+  color: var(--text);
+}
+
+.items-table th {
+  background-color: var(--panel);
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
+.items-table td.right-align,
+.items-table th.right-align {
+  text-align: right;
+}
+
+.item-row {
+  transition: background 0.2s;
+}
+
+.item-row:hover {
+  background-color: var(--panel);
+}
+
+.btn-add,
+.btn-remove {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75rem;
+  color: var(--text);
+}
+
+.total-amount {
+  color: var(--accent);
+}
+
+.memo-full {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.import-btn {
+  flex: 0 0 auto;
+  background-color: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  color: var(--text);
+}

@@ -1,0 +1,110 @@
+/* ============ Hero Wrapper ============ */
+.home__hero {
+  position: relative;
+  background: #000;
+  color: white;
+  min-height: 70vh;
+  overflow: hidden;
+}
+
+/* ============ Static Figures ============ */
+.figure.static {
+  position: absolute;
+  bottom: 0;
+  width: 350px;
+  filter: drop-shadow(0 0 8px #00bcd4);
+  opacity: 0.8;
+  z-index: 2;
+}
+.figure.static.left  { left: 10px; }
+.figure.static.right { right: 10px; }
+
+/* ============ Hero Overlay (text + button) ============ */
+.home__hero-overlay {
+  position: absolute;
+  top: 22%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 3;
+  padding: 0 1rem;
+}
+
+.hero-box {
+  display: inline-block;
+  background: rgba(0, 188, 212, 0.25);
+  border-radius: 8px;
+  padding: 2rem 3rem;
+}
+
+.btn-primary {
+  margin-top: 2rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background-color: #00bcd4;
+  color: #000;
+  font-weight: bold;
+  text-decoration: none;
+
+}
+.btn-primary:hover {
+  background-color: #00a9c0;
+}
+
+/* ============ Who We Are Section ============ */
+.home__about {
+  background: transparent;
+  padding: 4rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: left;
+  border-bottom: none !important;   /* ensure no bottom border */
+}
+
+.home__about h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #00bcd4;
+}
+
+.home__about p {
+  color: #7f8a8b;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  /* … your current mobile tweaks … */
+}
+
+/* ============ Footer ============ */
+.site-footer {
+  padding: 2rem 1rem;
+  border-top: none !important;      /* ensure no top border */
+}
+
+/* ============ Global Divider Removal ============ */
+/* Hide any <hr> anywhere in this container */
+.home hr,
+hr {
+  display: none !important;
+  border: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Remove any border-top on the next element after .home__about */
+.home__about + * {
+  border-top: none !important;
+}
+
+/* ============ Responsive Tweaks ============ */
+@media (max-width: 768px) {
+  .figure.static       { width: 200px; }
+  .home__hero-overlay  { top: 20%; }
+  .hero-box            { padding: 1.5rem 2rem; }
+  .home__about {
+    padding: 2rem 1rem;
+  }
+}

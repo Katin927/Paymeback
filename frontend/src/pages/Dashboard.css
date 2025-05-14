@@ -1,0 +1,204 @@
+
+.invoice-page {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  
+  .stats-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .stat-card {
+    background-color: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+  
+  .stat-card h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+  
+  .stat-card p {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .btn-primary {
+    background-color: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent);
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .btn-primary:hover {
+    box-shadow: 0 0 16px var(--accent);
+  }
+  
+  .upcoming-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .upcoming-panel {
+    background-color: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 4px 12px var(--shadow);
+  }
+  
+  .upcoming-panel h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+  }
+  
+  .line-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg);
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+  }
+  
+  .line-item span {
+    flex: 1;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  
+  .line-item .btn-primary.small {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .recent-section {
+    background-color: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px var(--shadow);
+    margin-top: 2rem;
+  }
+  
+  .recent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .recent-header h2 {
+    font-size: 1.5rem;
+    color: var(--accent);
+  }
+  
+  .recent-header input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background-color: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+    width: 250px;
+  }
+  
+  .accordion-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .collapse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .collapse-header span {
+    color: var(--text);
+  }
+  
+  .collapse-toggle {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    color: var(--accent);
+    cursor: pointer;
+  }
+  
+  .collapse-content {
+    padding: 0.75rem 1rem;
+    background-color: var(--panel);
+  }
+  
+  .collapse-content .line-field {
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+  
+  @media (max-width: 768px) {
+    .invoice-page {
+      padding: 1rem;
+    }
+  
+    .stats-cards,
+    .upcoming-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .btn-primary {
+      width: 100%;
+      margin-bottom: 0.75rem;
+    }
+  
+    .recent-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  
+    .recent-header input {
+      width: 100%;
+    }
+  
+    .collapse-content {
+      padding: 0.5rem 1rem;
+    }
+  }
+    

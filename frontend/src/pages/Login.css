@@ -1,0 +1,104 @@
+/* src/pages/Login.css */
+:root {
+  --form-bg: var(--panel);
+  --form-border: var(--border);
+  --form-shadow: var(--shadow);
+  --form-accent: var(--accent);
+  --form-text: var(--text);
+  --bg-overlay: rgba(0, 123, 255, 0.1);
+}
+
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.login__container {
+  background: var(--form-bg);
+  border: 1px solid var(--form-border);
+  border-radius: 8px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 4px 12px var(--form-shadow);
+}
+
+.login__logo {
+  width: 80px;
+  margin: 0 auto 1rem;
+  display: block;
+}
+
+.login__container h2 {
+  margin-bottom: 1rem;
+  color: var(--form-accent);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.login__error {
+  margin-bottom: 1rem;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.login__form label {
+  text-align: left;
+  font-weight: 500;
+}
+
+.login__form input {
+  background: var(--bg-overlay);
+  border: 1px solid var(--form-border);
+  border-radius: 4px;
+  padding: 0.6rem .05rem;
+  color: var(--form-text);
+  width: 100%;
+}
+
+.login__form input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.login__form .btn-primary {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-weight: 600;
+}
+
+.login__signup {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.login__signup a {
+  color: var(--form-accent);
+  text-decoration: none;
+}
+
+.login__signup a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login__container {
+    padding: 1.5rem;
+  }
+  .login__logo {
+    width: 60px;
+  }
+}
