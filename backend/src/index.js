@@ -13,27 +13,19 @@ const invoicesRouter = require('./routes/invoices');
 const prisma = new PrismaClient();
 const app    = express();
 
-// Whitelisted origins (add your frontend URLs here)
-const allowedOrigins = [
-  process.env.CORS_ORIGIN || 'http://localhost:3000',
-  'https://effortless-gingersnap-d18028.netlify.app'
-];
+// Temporarily allow all origins for CORS (you can lock this down later)
+app.use(cors({
+  origin: (incomingOrigin, callback) => {
+    // Allow requests with no origin (e.g. Postman, mobile clients)
+    if (!incomingOrigin) return callback(null, true);
+    // Allow all origins
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// CORS + cookie parsing
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      callback(new Error(`CORS policy: origin ${origin} not allowed`));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
 app.use(express.json());
 app.use(cookieParser());
 app.set('prisma', prisma);
