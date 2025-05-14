@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
-    "heroku-postbuild": "cd ../frontend && npm install && npm run build"
+    "start": "node src/index.js"
   },
   "dependencies": {
     "@prisma/client": "^6.7.0",
