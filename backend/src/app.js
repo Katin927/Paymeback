@@ -28,6 +28,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // ✅ handle CORS preflight requests
 app.use(express.json());
 
 // ✅ Health check route
