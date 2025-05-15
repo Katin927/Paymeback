@@ -1,3 +1,4 @@
+// src/app.js
 require('dotenv').config();
 
 const express = require('express');
@@ -12,39 +13,35 @@ const { authenticate } = require('./middleware/auth');
 const prisma = new PrismaClient();
 const app = express();
 
-// Make Prisma client available in routes via req.app.get('prisma')
+// Make Prisma client available to routes
 app.set('prisma', prisma);
 
-// CORS options
+// ✅ Updated CORS options for dev + prod
 const corsOptions = {
-  origin: 'https://effortless-gingersnap-d18028.netlify.app',  // Set to your frontend URL
+  origin: [
+    'http://localhost:3000', // dev
+    'https://effortless-gingersnap-d18028.netlify.app' // production (Netlify frontend)
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowing custom headers like Authorization
-  credentials: true,  // Allow credentials (cookies, session)
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
 
-// Enable CORS with the options
 app.use(cors(corsOptions));
-
-// Allow preflight requests for all routes
-app.options('*', cors(corsOptions));  // Respond to preflight OPTIONS requests
-
-// Parse JSON request bodies
 app.use(express.json());
 
+// ✅ Health check route
 app.get('/', (req, res) => {
   res.json({ message: 'PayMeBack API is up and running!' });
 });
 
-// Public routes
+// ✅ API routes
 app.use('/api/auth', authRouter);
-
-// Protected routes
 app.use('/api/users', authenticate, usersRouter);
 app.use('/api/invoices', authenticate, invoicesRouter);
 app.use('/api/contacts', authenticate, contactsRouter);
 
-// Error handler
+// ✅ Global error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({

@@ -1,17 +1,18 @@
-// backend/src/routes/contacts.js
-
-const express          = require('express');
-const router           = express.Router();
+const express = require('express');
+const router = express.Router();
 const { listContacts, addContact } = require('../services/contacts');
 const { authenticate } = require('../middleware/auth');
+
+// Validate email format (optional)
+const validateEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return emailRegex.test(email);
+};
 
 // GET /api/contacts
 router.get('/', authenticate, async (req, res, next) => {
   try {
-    const contacts = await listContacts(
-      req.app.get('prisma'),
-      req.user.userId
-    );
+    const contacts = await listContacts(req.app.get('prisma'), req.user.userId);
     res.json(contacts);
   } catch (err) {
     next(err);
@@ -20,8 +21,19 @@ router.get('/', authenticate, async (req, res, next) => {
 
 // POST /api/contacts
 router.post('/', authenticate, async (req, res, next) => {
+  const { name, email, phone } = req.body;
+
+  // Basic validation
+  if (!name || !email || !phone) {
+    return res.status(400).json({ error: 'Name, email, and phone are required' });
+  }
+
+  // Validate email format
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
   try {
-    const { name, email, phone } = req.body;
     const contact = await addContact(
       req.app.get('prisma'),
       req.user.userId,
