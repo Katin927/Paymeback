@@ -2,10 +2,11 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || '/api',
-  withCredentials: true,      // ← send cookies & other credentials
+  baseURL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000/api', // fallback to local dev
+  withCredentials: true, // Send cookies or session info
 });
 
+// Attach JWT token from localStorage
 API.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -14,6 +15,7 @@ API.interceptors.request.use(config => {
   return config;
 });
 
+// Handle 401 Unauthorized globally
 API.interceptors.response.use(
   res => res,
   err => {

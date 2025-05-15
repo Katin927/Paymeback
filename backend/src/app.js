@@ -10,17 +10,17 @@ const invoicesRouter = require('./routes/invoices');
 const contactsRouter = require('./routes/contacts');
 const { authenticate } = require('./middleware/auth');
 
-const prisma = new PrismaClient();
 const app = express();
+const prisma = new PrismaClient();
 
-// Make Prisma client available to routes
+// Make Prisma client available in routes
 app.set('prisma', prisma);
 
-// ✅ Updated CORS options for dev + prod
+// ✅ CORS setup for both dev and production
 const corsOptions = {
   origin: [
-    'http://localhost:3000', // dev
-    'https://effortless-gingersnap-d18028.netlify.app' // production (Netlify frontend)
+    'http://localhost:3000', // local dev
+    'https://effortless-gingersnap-d18028.netlify.app' // deployed frontend
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -32,22 +32,27 @@ app.use(express.json());
 
 // ✅ Health check route
 app.get('/', (req, res) => {
-  res.json({ message: 'PayMeBack API is up and running!' });
+  res.status(200).json({ message: 'PayMeBack API is up and running!' });
 });
 
-// ✅ API routes
+// ✅ Routes
 app.use('/api/auth', authRouter);
 app.use('/api/users', authenticate, usersRouter);
 app.use('/api/invoices', authenticate, invoicesRouter);
 app.use('/api/contacts', authenticate, contactsRouter);
 
+// ✅ Catch-all 404 for unknown routes
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
 // ✅ Global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('❌ Error:', err.stack);
   res.status(err.status || 500).json({
     error: {
       message: err.message || 'Internal Server Error',
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
     },
   });
 });

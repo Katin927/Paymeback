@@ -19,7 +19,7 @@ export default function Register() {
     console.log('Submitting register', form);
 
     try {
-      const { data } = await API.post('/auth/register', form);
+      const { data } = await API.post('https://paymeback.herokuapp.com/api/auth/register', form);
       console.log('Register success:', data);
       localStorage.setItem('token', data.token);
       navigate('/dashboard');

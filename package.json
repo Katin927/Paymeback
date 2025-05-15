@@ -1,27 +1,13 @@
 {
-  "name": "backend",
+  "name": "paymeback-monorepo",
   "version": "1.0.0",
-  "main": "src/index.js",
-  "license": "MIT",
+  "private": true,
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.7.0",
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^3.0.2",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^7.0.3",
-    "stripe": "^18.1.0",
-    "twilio": "^5.6.1"
+    "install-all": "npm install --prefix backend && npm install --prefix frontend",
+    "start": "npm start --prefix backend",
+    "dev": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\""
   },
   "devDependencies": {
-    "nodemon": "^3.1.10",
-    "prisma": "^6.7.0"
+    "concurrently": "^8.0.1"
   }
 }
