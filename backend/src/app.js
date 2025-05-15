@@ -17,13 +17,19 @@ app.set('prisma', prisma);
 
 // CORS options
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'https://effortless-gingersnap-d18028.netlify.app', // Use env variable for flexibility
+  origin: 'https://effortless-gingersnap-d18028.netlify.app',  // Set to your frontend URL
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],  // Allowing custom headers like Authorization
+  credentials: true,  // Allow credentials (cookies, session)
 };
 
+// Enable CORS with the options
 app.use(cors(corsOptions));
 
+// Allow preflight requests for all routes
+app.options('*', cors(corsOptions));  // Respond to preflight OPTIONS requests
+
+// Parse JSON request bodies
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -40,11 +46,11 @@ app.use('/api/contacts', authenticate, contactsRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);  // Log the full error stack for easier debugging
+  console.error(err.stack);
   res.status(err.status || 500).json({
     error: {
       message: err.message || 'Internal Server Error',
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined, // Show stack trace only in development
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     },
   });
 });
