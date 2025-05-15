@@ -17,7 +17,7 @@ app.set('prisma', prisma);
 
 // CORS options
 const corsOptions = {
-  origin: 'https://effortless-gingersnap-d18028.netlify.app', // replace with your Netlify URL
+  origin: process.env.CORS_ORIGIN || 'https://effortless-gingersnap-d18028.netlify.app', // Use env variable for flexibility
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 };
@@ -40,10 +40,13 @@ app.use('/api/contacts', authenticate, contactsRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err);
-  res
-    .status(err.status || 500)
-    .json({ error: err.message || 'Internal Server Error' });
+  console.error(err.stack);  // Log the full error stack for easier debugging
+  res.status(err.status || 500).json({
+    error: {
+      message: err.message || 'Internal Server Error',
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined, // Show stack trace only in development
+    },
+  });
 });
 
 module.exports = app;
