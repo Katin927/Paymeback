@@ -1,8 +1,8 @@
-<<<<<<< HEAD
 # Local Netlify folder
 .netlify
 node_modules/
-=======
+
 node_modules/
-.env
->>>>>>> heroku/main
+backend/node_modules/
+frontend/node_modules/
+
