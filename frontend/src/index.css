@@ -1,13 +1,209 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* src/index.css */
+
+/* 1. Define theme variables */
+:root {
+  --transition-speed: 0.3s;
+
+  /* Light theme */
+  --light-bg: #f5f7fa;
+  --light-card: #ffffff;
+  --light-text: #333333;
+  --light-border: #d1d5db;
+  
+  /* Dark theme */
+  --dark-bg: #121212;
+  --dark-card: #1e1e1e;
+  --dark-text: #e0e0e0;
+  --dark-border: #333333;
+
+  /* Accent (neon blue) */
+  --accent: #00d8ff;
+  --accent-hover: #00b7e6;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* 2. Theme toggling based on data-theme attr */
+[data-theme="light"] {
+  --bg: var(--light-bg);
+  --card-bg: var(--light-card);
+  --text: var(--light-text);
+  --border: var(--light-border);
+}
+
+[data-theme="dark"] {
+  --bg: var(--dark-bg);
+  --card-bg: var(--dark-card);
+  --text: var(--dark-text);
+  --border: var(--dark-border);
+}
+
+/* 3. Global resets & base */
+* {
+  box-sizing: border-box;
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* 4. Buttons */
+button,
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--transition-speed);
+}
+button:hover,
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+.btn-secondary:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* 5. Inputs */
+input, select, textarea {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card-bg);
+  color: var(--text);
+  transition: border-color var(--transition-speed);
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* 6. Cards & containers */
+.card, .bordered, .invoice-container, .register__container, .contacts, .dashboard-theme {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* 7. NavBar & Footer */
+nav, footer {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+}
+footer {
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--border);
+}
+
+/* 8. BottomNav (mobile) */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+}
+
+/* 9. Digital check style */
+.digital-check {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--card-bg);
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--text);
+}
+.digital-check .check-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.digital-check .check-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--accent);
+}
+.digital-check .date {
+  font-size: 0.9rem;
+}
+.digital-check .check-body .pay-to,
+.digital-check .check-body .memo {
+  margin: 0.75rem 0;
+}
+.digital-check .amount-box {
+  background: #000;
+  color: var(--accent);
+  padding: 1rem;
+  text-align: right;
+  font-size: 1.6rem;
+  font-weight: bold;
+  border-radius: 4px;
+}
+.digital-check .amount-text {
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+.digital-check .check-footer {
+  margin-top: 2rem;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+/* 10. Utility */
+.empty {
+  text-align: center;
+  color: var(--border);
+  padding: 1rem 0;
+}
+.accordion-list {
+  list-style: none;
+  padding: 0;
+}
+.collapse-header {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.collapse-content {
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+}
+
+/* 11. Neon glow accents */
+.neon {
+  text-shadow:
+    0 0 4px var(--accent),
+    0 0 8px var(--accent-hover);
 }

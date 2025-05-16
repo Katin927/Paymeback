@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter,
@@ -10,7 +11,7 @@ import {
 import NavBar from './components/NavBar';
 import Footer from './components/Footer';
 import BottomNav from './components/BottomNav';
-import PrivateRoute from './components/PrivateRoute'; // Make sure PrivateRoute checks `isLoggedIn`
+import PrivateRoute from './components/PrivateRoute';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 import Home from './pages/Home';
@@ -30,7 +31,6 @@ function AppContent() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check login status when the component mounts
   useEffect(() => {
     setIsLoggedIn(Boolean(localStorage.getItem('token')));
   }, []);
@@ -65,8 +65,14 @@ function AppContent() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/login"
+          element={<Login onLogin={() => setIsLoggedIn(true)} />}
+        />
+        <Route
+          path="/register"
+          element={<Register onLogin={() => setIsLoggedIn(true)} />}
+        />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />

@@ -1,5 +1,5 @@
 // src/pages/Invoice.jsx
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import API from '../api';
 import logo from '../assets/logo.png';
@@ -8,346 +8,281 @@ import './Invoice.css';
 export default function Invoice() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  /* eslint-disable-next-line no-unused-vars */
   const initialMode = searchParams.get('mode') || 'individual';
-
-  const [user, setUser] = useState({ id: null, name: '', email: '', phone: '' });
   const [mode, setMode] = useState(initialMode);
-  const [memo, setMemo] = useState('');
-  const [contact, setContact] = useState({ name: '', email: '', phone: '' });
-  const [participants, setParticipants] = useState([{ name: '', email: '', phone: '' }]);
-  const [items, setItems] = useState([{ description: '', amount: '' }]);
-  const [frequency, setFrequency] = useState('one-time');
-  const [splitMethod, setSplitMethod] = useState('equal');
-  const [shares, setShares] = useState(() => participants.map(() => ''));
-  const [importIndex, setImportIndex] = useState(null);
 
-  const fileInputRef = useRef(null);
+  // Form state
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    termsType: 'one-time',
+    planFreq: '',
+    memo: '',
+    items: [{ description: '', amount: '' }],
+    participants: []   // for split bill
+  });
+  const [error, setError] = useState('');
 
-  const invoiceNumber = useMemo(
-    () => `INV-${new Date().getFullYear()}-${Date.now()}`,
-    []
-  );
-  const issueDate = useMemo(() => new Date().toLocaleDateString(), []);
-  const total = useMemo(
-    () => items.reduce((sum, it) => sum + parseFloat(it.amount || 0), 0).toFixed(2),
-    [items]
-  );
+  // Compute total
+  const total = form.items
+    .reduce((sum, it) => sum + (parseFloat(it.amount) || 0), 0)
+    .toFixed(2);
 
-  const sumShares = () =>
-    shares.map(s => parseFloat(s || '0')).reduce((a, b) => a + b, 0).toFixed(2);
-
-  useEffect(() => {
-    API.get('/users/me')
-      .then(res => setUser(res.data))
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    if (mode !== 'split') return;
-    const count = participants.length;
-    if (splitMethod === 'equal') {
-      const share = (parseFloat(total) / count).toFixed(2);
-      setShares(Array(count).fill(share));
-    } else {
-      setShares(prev => (prev.length === count ? prev : Array(count).fill('')));
-    }
-  }, [mode, participants, splitMethod, total]);
-
-  const addItem = () => setItems(p => [...p, { description: '', amount: '' }]);
-  const removeItem = i => setItems(p => p.filter((_, idx) => idx !== i));
-  const updateItem = (i, f, v) =>
-    setItems(p => p.map((it, idx) => (idx === i ? { ...it, [f]: v } : it)));
-
-  const addParticipant = () =>
-    setParticipants(p => [...p, { name: '', email: '', phone: '' }]);
-  const removeParticipant = i =>
-    setParticipants(p => p.filter((_, idx) => idx !== i));
-  const updateParticipant = (i, f, v) =>
-    setParticipants(p => p.map((pt, idx) => (idx === i ? { ...pt, [f]: v } : pt)));
-  const updateShare = (i, v) =>
-    setShares(p => p.map((sh, idx) => (idx === i ? v : sh)));
-
-  const handleFile = async e => {
-    try {
-      const text = await e.target.files[0].text();
-      const name = text.match(/FN:(.+)/)?.[1].trim() || '';
-      const email = text.match(/EMAIL[^:]*:(.+)/)?.[1].trim() || '';
-      const phone = text.match(/TEL[^:]*:(.+)/)?.[1].trim() || '';
-      if (importIndex === -1) {
-        setContact({ name, email, phone });
-      } else {
-        setParticipants(p =>
-          p.map((pt, idx) => (idx === importIndex ? { name, email, phone } : pt))
-        );
-      }
-    } catch {
-      console.error('vCard import error');
-    } finally {
-      setImportIndex(null);
-    }
+  // Generic field handler
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
   };
 
+  // Line‐items handlers
+  const handleItemChange = (idx, e) => {
+    const next = [...form.items];
+    next[idx][e.target.name] = e.target.value;
+    setForm(f => ({ ...f, items: next }));
+  };
+  const addItem = () => {
+    setForm(f => ({
+      ...f,
+      items: [...f.items, { description: '', amount: '' }]
+    }));
+  };
+
+  // Participants handlers
+  const handleParticipantChange = (idx, e) => {
+    const next = [...form.participants];
+    next[idx][e.target.name] = e.target.value;
+    setForm(f => ({ ...f, participants: next }));
+  };
+  const addParticipant = () => {
+    setForm(f => ({
+      ...f,
+      participants: [...f.participants, { name: '', email: '', phone: '' }]
+    }));
+  };
+  const removeParticipant = idx => {
+    setForm(f => ({
+      ...f,
+      participants: f.participants.filter((_, i) => i !== idx)
+    }));
+  };
+
+  // Mode change handler
+  const handleModeChange = e => {
+    setMode(e.target.value);
+  };
+
+  // Submit
   const handleSubmit = async e => {
     e.preventDefault();
-    if (mode === 'split' && splitMethod === 'custom' && sumShares() !== total) {
-      return alert(`Shares sum $${sumShares()} but total is $${total}.`);
+    setError('');
+    if (!form.name || !form.email || !form.phone || form.items.length === 0) {
+      return setError('Name, email, phone, and at least one line item are required.');
+    }
+    if (mode === 'split' && form.participants.length === 0) {
+      return setError('Please add at least one participant for a split bill.');
     }
 
     const payload = {
-      ownerId: user.id,
-      borrowerName:
-        mode === 'individual' ? contact.name : participants[0]?.name || '',
-      borrowerEmail:
-        mode === 'individual' ? contact.email : participants[0]?.email || '',
-      borrowerPhone:
-        mode === 'individual' ? contact.phone : participants[0]?.phone || '',
-      issueDate: new Date().toISOString(),
-      items,
-      total: parseFloat(total),
-      termsType: frequency,
-      planAmount: null,
-      planFreq: null,
-      memo: memo || null
+      borrowerName: form.name,
+      borrowerEmail: form.email,
+      borrowerPhone: form.phone,
+      termsType: form.termsType,
+      planFreq: form.planFreq,
+      memo: form.memo,
+      items: form.items.map(i => ({
+        description: i.description,
+        amount: parseFloat(i.amount)
+      })),
+      ...(mode === 'split' && {
+        participants: form.participants.map(p => ({
+          name: p.name,
+          email: p.email,
+          phone: p.phone
+        }))
+      })
     };
 
     try {
-      await API.post('/invoices', payload);
-      navigate('/dashboard');
+      const { data } = await API.post('/invoices', payload);
+      navigate(`/invoice/${data.id}`);
     } catch (err) {
-      console.error('Submit error', err);
-      alert(
-        'Submission failed: ' + (err.response?.data?.error || err.message)
-      );
+      console.error(err);
+      setError(err.response?.data?.error || 'Failed to create invoice');
     }
   };
 
   return (
-    <div className={`invoice-page panel ${mode === 'split' ? 'split-mode' : ''}`}>
+    <div className="invoice-page">
       <header className="invoice-header">
-        <div className="invoice-logo-block">
-          <img src={logo} alt="Logo" className="invoice-logo" />
-          <div className="issuer-info">
-            <strong>{user.name}</strong>
-            <br />
-            {user.email}
-            <br />
-            {user.phone}
-          </div>
-        </div>
-        <div className="invoice-meta-box">
+        <img src={logo} alt="Logo" className="invoice-logo" />
+        <div className="invoice-meta">
           <div>
-            <strong>Invoice #:</strong> {invoiceNumber}
+            <label htmlFor="mode"><strong>Mode:</strong></label>
+            <select id="mode" name="mode" value={mode} onChange={handleModeChange}>
+              <option value="individual">Individual</option>
+              <option value="split">Split Bill</option>
+            </select>
           </div>
-          <div>
-            <strong>Date:</strong> {issueDate}
-          </div>
-          <select value={mode} onChange={e => setMode(e.target.value)}>
-            <option value="individual">Individual</option>
-            <option value="split">Split Bill</option>
-          </select>
         </div>
       </header>
 
-      <form className="invoice-form" onSubmit={handleSubmit}>
-        {mode === 'individual' && (
-          <section className="invoice-section contact-section">
-            <h2>Contact Info</h2>
-            <div className="field-group">
+      {mode === 'split' && (
+        <div className="participants-section">
+          <h3>Participants</h3>
+          {form.participants.map((p, i) => (
+            <div className="participant-row" key={i}>
               <input
+                name="name"
                 placeholder="Name"
-                value={contact.name}
-                onChange={e => setContact(c => ({ ...c, name: e.target.value }))}
+                autoComplete="name"
+                value={p.name}
+                onChange={e => handleParticipantChange(i, e)}
                 required
               />
               <input
-                placeholder="Email"
+                name="email"
                 type="email"
-                value={contact.email}
-                onChange={e => setContact(c => ({ ...c, email: e.target.value }))}
+                placeholder="Email"
+                autoComplete="email"
+                value={p.email}
+                onChange={e => handleParticipantChange(i, e)}
                 required
               />
               <input
-                placeholder="Phone"
+                name="phone"
                 type="tel"
-                value={contact.phone}
-                onChange={e => setContact(c => ({ ...c, phone: e.target.value }))}
+                placeholder="Phone"
+                autoComplete="tel"
+                value={p.phone}
+                onChange={e => handleParticipantChange(i, e)}
                 required
               />
               <button
                 type="button"
-                onClick={() => {
-                  setImportIndex(-1);
-                  fileInputRef.current.click();
-                }}
+                className="remove-participant-btn"
+                onClick={() => removeParticipant(i)}
               >
-                Import vCard
+                ×
               </button>
             </div>
-          </section>
-        )}
-
-        <section className="invoice-section items-section">
-          <h2>Invoice Items</h2>
-          <table className="items-table">
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Amount</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it, i) => (
-                <tr key={i}>
-                  <td>
-                    <input
-                      placeholder="Description"
-                      value={it.description}
-                      onChange={e =>
-                        updateItem(i, 'description', e.target.value)
-                      }
-                      required
-                    />
-                  </td>
-                  <td>
-                    <input
-                      placeholder="0.00"
-                      type="number"
-                      value={it.amount}
-                      onChange={e => updateItem(i, 'amount', e.target.value)}
-                      required
-                    />
-                  </td>
-                  <td>
-                    <button type="button" onClick={() => removeItem(i)}>
-                      ✕
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button type="button" onClick={addItem}>
-            + Add Item
-          </button>
-          <div className="total-line">
-            <strong>Total:</strong> ${total}
-          </div>
-        </section>
-
-        {mode === 'split' && (
-          <section className="invoice-section split-section">
-            <h2>Split Between</h2>
-            <div className="split-controls">
-              <select
-                value={splitMethod}
-                onChange={e => setSplitMethod(e.target.value)}
-              >
-                <option value="equal">Equal</option>
-                <option value="custom">Custom</option>
-              </select>
-              <span>Total: ${total}</span>
-              <button type="button" onClick={addParticipant}>
-                + Add Person
-              </button>
-            </div>
-            <table className="split-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Share</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {participants.map((p, i) => (
-                  <tr key={i}>
-                    <td>
-                      <input
-                        value={p.name}
-                        onChange={e =>
-                          updateParticipant(i, 'name', e.target.value)
-                        }
-                        required
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="email"
-                        value={p.email}
-                        onChange={e =>
-                          updateParticipant(i, 'email', e.target.value)
-                        }
-                        required
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="tel"
-                        value={p.phone}
-                        onChange={e =>
-                          updateParticipant(i, 'phone', e.target.value)
-                        }
-                        required
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={shares[i]}
-                        readOnly={splitMethod === 'equal'}
-                        onChange={e => updateShare(i, e.target.value)}
-                        required
-                      />
-                    </td>
-                    <td>
-                      <button type="button" onClick={() => removeParticipant(i)}>
-                        ✕
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        )}
-
-        <section className="invoice-section terms-section">
-          <h2>Payment Plan</h2>
-          <select
-            value={frequency}
-            onChange={e => setFrequency(e.target.value)}
+          ))}
+          <button
+            type="button"
+            className="add-participant-btn"
+            onClick={addParticipant}
           >
-            <option value="one-time">One-Time</option>
-            <option value="weekly">Weekly</option>
-            <option value="bi-weekly">Bi-Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </section>
+            + Add Participant
+          </button>
+        </div>
+      )}
 
-        <section className="invoice-section memo-section">
-          <h2>Memo / Notes</h2>
-          <textarea
-            value={memo}
-            onChange={e => setMemo(e.target.value)}
-            placeholder="Optional notes..."
-          />
-        </section>
+      <form className="invoice-form" onSubmit={handleSubmit}>
+        {/* Borrower fields */}
+        <div className="field-row">
+          <div className="field-group">
+            <label>Name</label>
+            <input
+              name="name"
+              placeholder="Full Name"
+              autoComplete="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="field-group">
+            <label>Email</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="field-group">
+            <label>Phone</label>
+            <input
+              name="phone"
+              type="tel"
+              placeholder="(555) 123-4567"
+              autoComplete="tel"
+              value={form.phone}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
 
-        <button type="submit">Submit Invoice</button>
+        {/* Line items */}
+        <h3>Line Items</h3>
+        <table className="items-table">
+          <thead>
+            <tr><th>Description</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            {form.items.map((it, idx) => (
+              <tr key={idx}>
+                <td>
+                  <input
+                    name="description"
+                    placeholder="Item"
+                    value={it.description}
+                    onChange={e => handleItemChange(idx, e)}
+                    required
+                  />
+                </td>
+                <td>
+                  <input
+                    name="amount"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    value={it.amount}
+                    onChange={e => handleItemChange(idx, e)}
+                    required
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total:</td>
+              <td className="total-cell">${total}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <button
+          type="button"
+          className="btn-secondary small"
+          onClick={addItem}
+        >
+          + Add Line Item
+        </button>
+
+        {/* Memo */}
+        <div className="field-row">
+          <div className="field-group full">
+            <label>Memo</label>
+            <textarea
+              name="memo"
+              placeholder="Notes (optional)"
+              value={form.memo}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        {/* Error & submit */}
+        {error && <p className="error">{error}</p>}
+        <button type="submit" className="btn-primary large">
+          {mode === 'split' ? 'Create Split Invoice' : 'Create Invoice'}
+        </button>
       </form>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".vcf"
-        style={{ display: 'none' }}
-        onChange={handleFile}
-      />
     </div>
   );
 }

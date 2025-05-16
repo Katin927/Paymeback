@@ -7,7 +7,7 @@ import './Invoice.css';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [user, setUser] = useState({ name: '' });
+  const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
     totalBorrowed: '0.00',
     totalOwed: '0.00',
@@ -25,34 +25,48 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
+        // 1️⃣ Fetch current user
         const { data: userData } = await API.get('/users/me');
         setUser(userData);
 
+        // 2️⃣ Fetch invoices (each has a scalar `total` field)
         const { data: invoices } = await API.get('/invoices');
-        const pending = invoices.filter(i => i.status === 'pending');
-        const youOwe  = pending.filter(i => i.borrowerEmail === userData.email);
+
+        // 3️⃣ Ensure `total` is a string with two decimals
+        const enriched = invoices.map(inv => ({
+          ...inv,
+          total: Number(inv.total).toFixed(2)
+        }));
+
+        // 4️⃣ Split pending into youOwe vs theyOwe
+        const pending = enriched.filter(i => i.status === 'pending');
+        const youOwe = pending.filter(i => i.borrowerEmail === userData.email);
         const theyOwe = pending.filter(i => i.borrowerEmail !== userData.email);
 
-        const totalBorrowed = youOwe
-          .reduce((sum, inv) => sum + parseFloat(inv.total), 0)
-          .toFixed(2);
-        const totalOwed = theyOwe
-          .reduce((sum, inv) => sum + parseFloat(inv.total), 0)
-          .toFixed(2);
-
+        // Sort by dueDate ascending
         youOwe.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
         theyOwe.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
 
+        // 5️⃣ Compute totals from the scalar `total`
+        const totalBorrowed = youOwe
+          .reduce((sum, inv) => sum + Number(inv.total), 0)
+          .toFixed(2);
+        const totalOwed = theyOwe
+          .reduce((sum, inv) => sum + Number(inv.total), 0)
+          .toFixed(2);
+
+        // 6️⃣ Update stats
         setStats({
           totalBorrowed,
           totalOwed,
           upcomingPayments: youOwe.slice(0, 5),
           upcomingDeposits: theyOwe.slice(0, 5),
-          recentInvoices: invoices.sort(
+          recentInvoices: enriched.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           )
         });
       } catch (err) {
+        console.error('Dashboard fetch error:', err);
         setError(err.response?.data?.error || err.message);
       } finally {
         setLoading(false);
@@ -62,7 +76,7 @@ export default function Dashboard() {
   }, []);
 
   if (loading) return <div className="empty">Loading...</div>;
-  if (error)   return <div className="empty">Error: {error}</div>;
+  if (error) return <div className="empty">Error: {error}</div>;
 
   const filtered = stats.recentInvoices.filter(inv =>
     inv.borrowerName.toLowerCase().includes(search.toLowerCase()) ||
@@ -78,6 +92,7 @@ export default function Dashboard() {
     <div className="invoice-container dashboard-theme">
       <h1>Welcome, {user.name}</h1>
 
+      {/* Stats */}
       <section className="stats-cards">
         <div className="stat-card bordered">
           <h3>Cash Outflow</h3>
@@ -89,6 +104,7 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {/* New Invoice */}
       <button
         className="btn-primary"
         onClick={() => navigate('/invoice?mode=individual')}
@@ -96,6 +112,7 @@ export default function Dashboard() {
         + New Invoice
       </button>
 
+      {/* Upcoming Payments & Deposits */}
       <section className="upcoming-grid">
         <div className="upcoming-panel bordered">
           <h2>Upcoming Payments</h2>
@@ -104,7 +121,7 @@ export default function Dashboard() {
               <div key={u.id} className="line-item">
                 <span>{u.borrowerName}</span>
                 <span>Terms: {formatTerm(u)}</span>
-                <span>${parseFloat(u.total).toFixed(2)}</span>
+                <span>${u.total}</span>
                 <button
                   className="btn-primary small"
                   onClick={() => navigate(`/pay/${u.id}`)}
@@ -117,7 +134,6 @@ export default function Dashboard() {
             <p className="empty">No upcoming payments.</p>
           )}
         </div>
-
         <div className="upcoming-panel bordered">
           <h2>Upcoming Deposits</h2>
           {stats.upcomingDeposits.length > 0 ? (
@@ -125,7 +141,7 @@ export default function Dashboard() {
               <div key={u.id} className="line-item">
                 <span>{u.borrowerName}</span>
                 <span>Terms: {formatTerm(u)}</span>
-                <span>${parseFloat(u.total).toFixed(2)}</span>
+                <span>${u.total}</span>
               </div>
             ))
           ) : (
@@ -134,6 +150,7 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {/* Recent Activity Accordion */}
       <div className="recent-section bordered">
         <div className="recent-header">
           <h2>Recent Activity</h2>
@@ -153,26 +170,16 @@ export default function Dashboard() {
                   className="collapse-header"
                   onClick={() => toggle(r.id)}
                 >
-                  <span>
-                    {Array.isArray(r.participants)
-                      ? r.participants.map(p => p.name).join(', ')
-                      : r.borrowerName}
-                  </span>
+                  <span>{r.borrowerName}</span>
                   <button className="collapse-toggle">
                     {open ? '−' : '+'}
                   </button>
                 </div>
                 {open && (
                   <div className="collapse-content">
-                    <div className="line-field">
-                      Phone: {r.borrowerPhone}
-                    </div>
-                    <div className="line-field">
-                      Email: {r.borrowerEmail}
-                    </div>
-                    <div className="line-field">
-                      Amount: ${parseFloat(r.total).toFixed(2)}
-                    </div>
+                    <div className="line-field">Phone: {r.borrowerPhone}</div>
+                    <div className="line-field">Email: {r.borrowerEmail}</div>
+                    <div className="line-field">Amount: ${r.total}</div>
                     <button
                       className="btn-secondary"
                       onClick={() => alert('Reminder sent')}

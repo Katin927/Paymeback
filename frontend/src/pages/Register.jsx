@@ -5,8 +5,13 @@ import API from '../api';
 import './Register.css';
 import logo from '../assets/logo.png';
 
-export default function Register() {
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+export default function Register({ onLogin }) {
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: ''
+  });
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -16,19 +21,26 @@ export default function Register() {
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
-    console.log('Submitting register', form);
 
     try {
-      const { data } = await API.post('https://paymeback.herokuapp.com/api/auth/register', form);
-      console.log('Register success:', data);
+      const { data } = await API.post('/auth/register', form);
       localStorage.setItem('token', data.token);
+      onLogin();                  // notify App that we're logged in
       navigate('/dashboard');
     } catch (err) {
-      console.error('Register failed:', err.response?.status, err.response?.data);
-      if (err.response?.status === 409) {
-        setError('That email is already registered. Please log in or use another email.');
+      console.error('Register failed response data:', err.response?.data);
+      if (!err.response) {
+        setError('Network error—please check your connection and try again.');
       } else {
-        setError(err.response?.data?.error || 'Registration failed. Please try again.');
+        const status = err.response.status;
+        const serverMsg = err.response.data?.error;
+        if (status === 400) {
+          setError(serverMsg || 'Please fill out all fields correctly.');
+        } else if (status === 409) {
+          setError('That email is already registered. Please log in or use another email.');
+        } else {
+          setError(serverMsg || 'Registration failed. Please try again.');
+        }
       }
     }
   };
@@ -63,6 +75,14 @@ export default function Register() {
             name="password"
             placeholder="Password"
             value={form.password}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone Number"
+            value={form.phone}
             onChange={handleChange}
             required
           />

@@ -1,28 +1,27 @@
-// src/index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import reportWebVitals from './reportWebVitals';
+
 // Stripe
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 
-// Global styles: theme and resets
-import './styles/theme.css';
-import './styles/global.css';
+// Tailwind + global styles
+import './index.css'; // Includes @tailwind directives
 
+// Stripe public key from environment
 const publishableKey = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY;
-let stripePromise = null;
+const stripePromise = publishableKey ? loadStripe(publishableKey) : null;
 
 if (!publishableKey) {
   console.error(
     '❌ Missing REACT_APP_STRIPE_PUBLISHABLE_KEY! Please set it in frontend/.env'
   );
-} else {
-  stripePromise = loadStripe(publishableKey);
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <React.StrictMode>
     {stripePromise ? (

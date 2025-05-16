@@ -1,70 +1,73 @@
 // src/pages/Login.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import './Login.css';
-import logo from '../assets/logo.png';
 import API from '../api';
+import './Register.css'; // reuse same styles
+import logo from '../assets/logo.png';
 
 export default function Login({ onLogin }) {
-  const [email, setEmail]       = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const navigate                = useNavigate();
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    AOS.init({ duration: 800 });
-  }, []);
+  const handleChange = e =>
+    setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
+
     try {
-      const { data } = await API.post('/auth/login', { email, password });
+      const { data } = await API.post('/auth/login', form);
       localStorage.setItem('token', data.token);
-      onLogin();
+      onLogin();               // notify App that we're logged in
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed');
+      console.error('Login error:', err.response?.data);
+      if (!err.response) {
+        setError('Network error—please try again.');
+      } else if (err.response.status === 400) {
+        setError(err.response.data.error || 'Invalid credentials.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     }
   };
 
   return (
-    <div className="login">
-      <div className="login__container" data-aos="fade-up">
-        <img src={logo} alt="PayMeBack Logo" className="login__logo" />
-        <h2>Welcome Back</h2>
-        {error && <div className="login__error">{error}</div>}
-        <form className="login__form" onSubmit={handleSubmit}>
-          <label htmlFor="email">Email</label>
+    <div className="register">
+      <div className="register__container">
+        <img src={logo} alt="PayMeBack Logo" className="register__logo-img" />
+        <h2>Sign In</h2>
+
+        {error && <div className="register__error">{error}</div>}
+
+        <form className="register__form" onSubmit={handleSubmit}>
           <input
-            id="email"
             type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
+            name="email"
+            placeholder="Email Address"
+            value={form.email}
+            onChange={handleChange}
             required
           />
-
-          <label htmlFor="password">Password</label>
           <input
-            id="password"
             type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
             required
           />
-
           <button type="submit" className="btn-primary">
             Log In
           </button>
         </form>
-        <p className="login__signup">
-          Don't have an account? <Link to="/register">Register</Link>
-        </p>
+
+        <div className="register__signin">
+          Don’t have an account? <Link to="/register">Sign up</Link>
+        </div>
       </div>
     </div>
-);
+  );
 }
