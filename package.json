@@ -2,11 +2,12 @@
   "name": "paymeback-fullstack",
   "version": "1.0.0",
   "private": true,
-  "engines": { "node": "18.x" },
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
-    "postinstall": "cd backend && npm install && cd ../frontend && npm install",
-    "heroku-postbuild": "cd frontend && npm run build",
+    "heroku-prebuild": "npm install --prefix backend",
+    "heroku-postbuild": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "node backend/src/app.js"
   }
 }
-
