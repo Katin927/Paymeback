@@ -6,7 +6,7 @@
     "node": "18.x"
   },
   "scripts": {
-    "heroku-prebuild": "npm install --prefix backend && npm --prefix backend exec prisma generate --schema=backend/prisma/schema.prisma",
+    "heroku-prebuild": "npm install --prefix backend && cd backend && npx prisma generate",
     "heroku-postbuild": "npm install --prefix frontend && npm run build --prefix frontend",
     "start": "node backend/src/app.js"
   }
