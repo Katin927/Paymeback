@@ -1,6 +1,4 @@
-# Paymeback
-
-# PaymebackPayMeBack 💸
+PayMeBack 💸
 
 PayMeBack URL: [https://paymeback.herokuapp.com/](https://paymeback-74046f9ebc9c.herokuapp.com/)
 GitHub repo URL: https://github.com/Katin927/PayMeBack
