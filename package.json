@@ -1,13 +1,13 @@
 {
-  "name": "paymeback-monorepo",
+  "name": "paymeback-fullstack",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "install-all": "npm install --prefix backend && npm install --prefix frontend",
-    "start": "npm start --prefix backend",
-    "dev": "concurrently \"npm start --prefix backend\" \"npm start --prefix frontend\""
+  "engines": {
+    "node": "18.x"
   },
-  "devDependencies": {
-    "concurrently": "^8.0.1"
+  "scripts": {
+    "postinstall": "npm install --prefix backend && npm install --prefix frontend",
+    "heroku-postbuild": "npm run build --prefix frontend",
+    "start": "node backend/src/app.js"
   }
 }
