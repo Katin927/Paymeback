@@ -3,25 +3,20 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^6.7.0",
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^3.0.2",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "nodemailer": "^7.0.3",
-    "stripe": "^18.1.0",
-    "twilio": "^5.6.1"
+    "@prisma/client": "^6.7.0"
+    
   },
   "devDependencies": {
-    "nodemon": "^3.1.10",
-    "prisma": "^6.7.0"
+    "prisma": "^6.7.0",
+    "nodemon": "^3.1.10"
   }
 }
