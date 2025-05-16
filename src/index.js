@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // backend/src/index.js
 require('dotenv').config();
 const express      = require('express');
@@ -67,3 +68,14 @@ app.use((err, _req, res, _next) => {
 // start
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`🚀 Server listening on port ${port}`));
+=======
+// src/index.js
+require('dotenv').config();
+const app = require('./app');
+
+const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 PayMeBack API running at http://localhost:${PORT}`);
+});
+>>>>>>> heroku/main
